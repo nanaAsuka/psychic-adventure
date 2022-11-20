@@ -1,7 +1,4 @@
-#### This script obtains variables SMQ140 ("Do you now smoke a pipe"), 
-####                               SMD070 ("# cigarettes smoked per day now), 
-####                               SMD055 ("Age last smoked cigarettes regularly")
-####                               in SMQ dataset from Questionnaire Data
+#### This script obtains variables SMQ020 ("Smoked at least 100 cigarettes in life") in SMQ dataset from Questionnaire Data
 #### D: 2005-2006
 #### E: 2007-2008
 #### F: 2009-2010
