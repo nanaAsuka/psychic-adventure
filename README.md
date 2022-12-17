@@ -11,3 +11,7 @@ All R codes are in the code folder, including data selecting, data preprocessing
 
 ## Results
 All processed data, including comeplete data, startified data, down-sampling data and SMOTE data, figures and tables are in the results folder 
+
+
+## Dependencies
+Tidyverse, data.table, caret, MLmetrics, pRoc, class, e1071, randomForest, rfUtilities, foreign, etc
