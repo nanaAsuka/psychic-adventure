@@ -90,7 +90,7 @@ Random   Forest                            & 0.1011                        & 0.8
 
 
 \textbf{Table.2} compares the performance metrics of the six proposed models developed on Stratified-Sampling, Down-Sampling and SMOTE-Sampling, respectively.
-F1 score, balanced accuracy and AUC were obtained based upon the confusion matrix.
+F1 score, balanced accuracy were obtained based upon the confusion matrix with a fixed threshold, and AUC evaluated that classifier over all possible thresholds. 
 
 Overall speaking, the optimal performance is attributable to the XGBoost model. It outperforms other models with the highest measures in AUC (0.80596/0.809466) under Stratified and Down-sampling, Balanced Accuracy (0.735565) under Down-sampling, and F1 score (0.327179) under Down-sampling. The SVM model was close in performance to XGBoost under all sampling methods. Compared to SMOTE, Down-sampling did exert a more significant effect on the performance of SVM and XGBoost, with an observed increase of 20% in balanced accuracy for both and around 10% in AUC for SVM.
 
