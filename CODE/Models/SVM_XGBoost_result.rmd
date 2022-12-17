@@ -1,0 +1,222 @@
+---
+title: "SVM_XGBoost_result"
+author: "Ruixuan Wang"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include = FALSE}
+library(caret)
+library(ROCR)
+library(dplyr)
+library(caTools)
+library(pROC)
+library(stats)
+load("train_test_bin.rdata")
+AUC_value = NULL
+balanced_accuracy = NULL
+F1 = NULL
+hyp_parameter = NULL
+```
+
+# WITHOUT SMOTE
+```{r,error=FALSE, include = FALSE}
+# XGBOOST Without SMOTE
+load("xgboost_pred_bin.rdata")
+hyp_parameter = rbind(
+  hyp_parameter,
+  straified = c(xgb_model$bestTune$nrounds, xgb_model$bestTune$max_depth)
+)
+# confusion matrix
+CM_xgboost = confusionMatrix(test_pred,
+                             testing$dep_level_bin,
+                             mode = "everything",
+                             positive = "1")
+balanced_accuracy = c(balanced_accuracy, XGBoost = unname(CM_xgboost$byClass[length(CM_xgboost$byClass)]))
+F1 = c(F1, XGBoost = unname(CM_xgboost$byClass[7]))
+# ROC curve
+prediction = predict(xgb_model, testing, type = "prob")[, 2]
+roc_xgboost = roc(testing$dep_level_bin, prediction)
+# AUC value
+pred = prediction(prediction, testing$dep_level_bin)
+auc = performance(pred, measure = "auc")
+AUC_value = c(AUC_value, XGBoost = auc@y.values[[1]])
+```
+
+
+```{r include = FALSE}
+# SVM Without SMOTE
+load("svm_caret_pred_bin.rdata")
+# confusion matrix
+CM_svm = confusionMatrix(test_pred,
+                         testing$dep_level_bin,
+                         mode = "everything",
+                         positive = "1")
+balanced_accuracy = c(balanced_accuracy, SVM = unname(CM_svm$byClass[length(CM_svm$byClass)]))
+F1 = c(F1, SVM = unname(CM_svm$byClass[7]))
+# ROC curve
+roc_svm = roc(testing$dep_level_bin, test_pred_p)
+# AUC value
+pred = prediction(test_pred_p, testing$dep_level_bin)
+auc = performance(pred, measure = "auc")
+AUC_value = c(AUC_value, SVM = auc@y.values[[1]])
+```
+
+```{r}
+# plot roc curve
+ggroc(list(XGBoost = roc_xgboost, SVM = roc_svm)) + theme_bw()
+```
+
+```{r message = F, warning = F}
+Model_performance1 = data.frame(
+  F1 = F1,
+  balanced_accuracy = balanced_accuracy,
+  AUC_value = unname(AUC_value)
+)
+knitr::kable(Model_performance1, "pandoc") 
+```
+
+# WITH SMOTE
+```{r include = FALSE}
+load("train2_test_bin.rdata")
+AUC_value = NULL
+balanced_accuracy = NULL
+F1 = NULL
+```
+
+```{r,error=FALSE, include = FALSE}
+# XGBOOST With SMOTE
+load("xgboost_pred_bin2.rdata")
+hyp_parameter = rbind(hyp_parameter,
+                      SMOTE = c(xgb_model$bestTune$nrounds, xgb_model$bestTune$max_depth))
+# confusion matrix
+CM_xgboost = confusionMatrix(test_pred,
+                             testing$dep_level_bin,
+                             mode = "everything",
+                             positive = "1")
+balanced_accuracy = c(balanced_accuracy, XGBoost = unname(CM_xgboost$byClass[length(CM_xgboost$byClass)]))
+F1 = c(F1, XGBoost = unname(CM_xgboost$byClass[7]))
+# ROC curve
+prediction = predict(xgb_model, testing, type = "prob")[, 2]
+roc_xgboost = roc(testing$dep_level_bin, prediction)
+# AUC value
+pred = prediction(prediction, testing$dep_level_bin)
+auc = performance(pred, measure = "auc")
+AUC_value = c(AUC_value, XGBoost = auc@y.values[[1]])
+```
+
+```{r include = FALSE}
+# SVM With SMOTE
+load("svm_caret_pred_bin2.rdata")
+# confusion matrix
+CM_svm = confusionMatrix(test_pred,
+                         testing$dep_level_bin,
+                         mode = "everything",
+                         positive = "1")
+balanced_accuracy = c(balanced_accuracy, SVM = unname(CM_svm$byClass[length(CM_svm$byClass)]))
+F1 = c(F1, SVM = unname(CM_svm$byClass[7]))
+# ROC curve
+roc_svm = roc(testing$dep_level_bin, test_pred_p)
+# AUC value
+pred = prediction(test_pred_p, testing$dep_level_bin)
+auc = performance(pred, measure = "auc")
+AUC_value = c(AUC_value, SVM = auc@y.values[[1]])
+```
+
+```{r}
+# plot roc curve
+ggroc(list(XGBoost = roc_xgboost, SVM = roc_svm)) + theme_bw()
+```
+
+```{r message = F, warning = F}
+Model_performance2 = data.frame(
+  F1 = F1,
+  balanced_accuracy = balanced_accuracy,
+  AUC_value = unname(AUC_value)
+)
+knitr::kable(Model_performance2, "pandoc") 
+```
+
+# DOWNSAMPLING
+```{r include = FALSE}
+load("train3_test_bin.rdata")
+AUC_value = NULL
+balanced_accuracy = NULL
+F1 = NULL
+```
+
+```{r,error=FALSE, include = FALSE}
+# XGBOOST With downsampling
+load("xgboost_pred_bin3.rdata")
+hyp_parameter = rbind(
+  hyp_parameter,
+  down_sampling = c(xgb_model$bestTune$nrounds, xgb_model$bestTune$max_depth)
+)
+# feature importance
+xgboost_imp = varImp(xgb_model)
+```
+```{r,error=FALSE}
+ggplot(xgboost_imp) + theme_bw()
+ggsave("imp_plot_xgboost.png")
+```
+```{r,error=FALSE, include = FALSE}
+# confusion matrix
+CM_xgboost = confusionMatrix(test_pred,
+                             testing$dep_level_bin,
+                             mode = "everything",
+                             positive = "1")
+balanced_accuracy = c(balanced_accuracy, XGBoost = unname(CM_xgboost$byClass[length(CM_xgboost$byClass)]))
+F1 = c(F1, XGBoost = unname(CM_xgboost$byClass[7]))
+# ROC curve
+prediction = predict(xgb_model, testing, type = "prob")[, 2]
+roc_xgboost = roc(testing$dep_level_bin, prediction)
+# AUC value
+pred = prediction(prediction, testing$dep_level_bin)
+auc = performance(pred, measure = "auc")
+AUC_value = c(AUC_value, XGBoost = auc@y.values[[1]])
+```
+
+```{r include = FALSE}
+# SVM downsampling
+load("svm_caret_pred_bin3.rdata")
+# confusion matrix
+CM_svm = confusionMatrix(test_pred,
+                         testing$dep_level_bin,
+                         mode = "everything",
+                         positive = "1")
+balanced_accuracy = c(balanced_accuracy, SVM = unname(CM_svm$byClass[length(CM_svm$byClass)]))
+F1 = c(F1, SVM = unname(CM_svm$byClass[7]))
+# ROC curve
+roc_svm = roc(testing$dep_level_bin, test_pred_p)
+# AUC value
+pred = prediction(test_pred_p, testing$dep_level_bin)
+auc = performance(pred, measure = "auc")
+AUC_value = c(AUC_value, SVM = auc@y.values[[1]])
+```
+
+```{r}
+# plot roc curve
+ggroc(list(XGBoost = roc_xgboost, SVM = roc_svm)) + theme_bw()
+```
+
+```{r message = F, warning = F}
+Model_performance3 = data.frame(
+  F1 = F1,
+  balanced_accuracy = balanced_accuracy,
+  AUC_value = unname(AUC_value)
+)
+knitr::kable(Model_performance3, "pandoc") 
+```
+
+```{r message = F, warning = F}
+colnames(hyp_parameter) = c("nrounds","max_depth")
+knitr::kable(hyp_parameter, "pandoc") 
+```
+
+```{r include = FALSE}
+Model_performance = cbind(Model_performance1,
+                          Model_performance3,
+                          Model_performance2)
+write.csv(Model_performance, file = "Model_performance.csv")
+write.csv(hyp_parameter, file = "hyp_parameter.csv")
+```
