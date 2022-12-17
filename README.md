@@ -10,4 +10,4 @@ Qiaochu Chen, Menghui Sun, Ruixuan Wang
 All R codes are in the code folder, including data selecting, data preprocessing, EDA and splitting, and 6 machine learning methods.
 
 ## Results
-All processed data, including comeplete data, startified data, down-sampling data and SMOT data, figures and tables are in the results folder 
+All processed data, including comeplete data, startified data, down-sampling data and SMOTE data, figures and tables are in the results folder 
