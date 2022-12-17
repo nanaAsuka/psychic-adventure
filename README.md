@@ -1,4 +1,4 @@
-# BIOSTAT625 
+# Depression Level Classification in NHANES dataset 
 
 ## Group member
 Qiaochu Chen, Menghui Sun, Ruixuan Wang
